@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.job4j.urlshortcut.model.Site;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -37,8 +38,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
             throws AuthenticationException {
         try {
-            ru.job4j.urlshortcut.model.User creds = new ObjectMapper()
-                    .readValue(req.getInputStream(), ru.job4j.urlshortcut.model.User.class);
+            Site creds = new ObjectMapper()
+                    .readValue(req.getInputStream(), Site.class);
 
             return auth.authenticate(
                     new UsernamePasswordAuthenticationToken(
