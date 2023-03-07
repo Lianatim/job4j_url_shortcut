@@ -11,11 +11,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.context.annotation.Bean;
-import ru.job4j.urlshortcut.jwt.JWTAuthenticationFilter;
-import ru.job4j.urlshortcut.jwt.JWTAuthorizationFilter;
+import ru.job4j.urlshortcut.filter.JWTAuthenticationFilter;
+import ru.job4j.urlshortcut.filter.JWTAuthorizationFilter;
 import ru.job4j.urlshortcut.service.UserDetailsServiceImpl;
 
-import static ru.job4j.urlshortcut.jwt.JWTAuthenticationFilter.SIGN_UP_URL;
+import static ru.job4j.urlshortcut.filter.JWTAuthenticationFilter.SIGN_UP_URL;
 
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
