@@ -3,11 +3,18 @@ package ru.job4j.urlshortcut.controller;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import ru.job4j.urlshortcut.dto.SiteDto;
+import ru.job4j.urlshortcut.exception.ResourceNotFoundException;
 import ru.job4j.urlshortcut.exception.UserAlreadyExistsException;
 import ru.job4j.urlshortcut.model.Site;
+import ru.job4j.urlshortcut.model.URL;
 import ru.job4j.urlshortcut.service.AuthorityService;
 import ru.job4j.urlshortcut.service.SiteService;
 
@@ -18,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
-@RequestMapping("/users")
 public class SiteController {
 
     private final SiteService siteService;
@@ -60,5 +66,18 @@ public class SiteController {
                 .map(i -> random.nextInt(chars.length()))
                 .mapToObj(randomInd -> String.valueOf(chars.charAt(randomInd)))
                 .collect(Collectors.joining());
+    }
+
+    @PostMapping("/convert")
+    public ResponseEntity<String> convert(@Valid @RequestBody URL url) {
+        String code = generateRandomString();
+        url.setCode(code);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Site site = siteService.findByLogin(auth.getName()).orElseThrow(() -> new ResourceNotFoundException("User not exist with login: " + auth.getName()));
+        site.addUrlList(url);
+        String json = "{"
+                + "\"code\" : \"" + code + "\""
+                + "}";
+        return new ResponseEntity<>(json, HttpStatus.CREATED);
     }
 }

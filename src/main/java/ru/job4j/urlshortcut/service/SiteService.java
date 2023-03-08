@@ -6,6 +6,7 @@ import ru.job4j.urlshortcut.model.Site;
 import ru.job4j.urlshortcut.repository.SiteRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SiteService {
@@ -23,6 +24,10 @@ public class SiteService {
 
     public void save(Site site) {
         siteRepository.save(site);
+    }
+
+    public Optional<Site> findByLogin(String login) {
+        return siteRepository.findByLogin(login);
     }
 
 }
