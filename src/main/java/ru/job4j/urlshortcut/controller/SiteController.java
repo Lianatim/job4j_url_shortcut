@@ -6,19 +6,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.job4j.urlshortcut.dto.SiteDto;
+import ru.job4j.urlshortcut.dto.StatisticDTO;
 import ru.job4j.urlshortcut.exception.ResourceNotFoundException;
 import ru.job4j.urlshortcut.exception.UserAlreadyExistsException;
 import ru.job4j.urlshortcut.model.Site;
 import ru.job4j.urlshortcut.model.URL;
 import ru.job4j.urlshortcut.service.AuthorityService;
 import ru.job4j.urlshortcut.service.SiteService;
+import ru.job4j.urlshortcut.service.UrlService;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,11 +30,13 @@ public class SiteController {
     private final SiteService siteService;
     private final PasswordEncoder encoder;
     private final AuthorityService authorityService;
+    private final UrlService urlService;
 
-    public SiteController(PasswordEncoder encoder, SiteService siteService, AuthorityService authorityService) {
+    public SiteController(PasswordEncoder encoder, SiteService siteService, AuthorityService authorityService, UrlService urlService) {
         this.encoder = encoder;
         this.siteService = siteService;
         this.authorityService = authorityService;
+        this.urlService = urlService;
     }
 
     @PostMapping("/reg")
@@ -73,11 +75,26 @@ public class SiteController {
         String code = generateRandomString();
         url.setCode(code);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Site site = siteService.findByLogin(auth.getName()).orElseThrow(() -> new ResourceNotFoundException("User not exist with login: " + auth.getName()));
+        Site site = siteService.findByLogin(auth.getName()).orElseThrow(() ->
+                new ResourceNotFoundException("User not exist with login: " + auth.getName()));
         site.addUrlList(url);
         String json = "{"
                 + "\"code\" : \"" + code + "\""
                 + "}";
         return new ResponseEntity<>(json, HttpStatus.CREATED);
+    }
+
+    @GetMapping ("/redirect/{code}")
+    public ResponseEntity<Void> convert(@PathVariable String code) {
+        URL url = urlService.findByCode(code).orElseThrow(() -> new ResourceNotFoundException("Code not exist : " + code));
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(url.getUrl())).build();
+    }
+
+    @GetMapping ("/statistic")
+    public ResponseEntity<List<StatisticDTO>> statistic(@PathVariable String code) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Site site = siteService.findByLogin(auth.getName()).orElseThrow(() ->
+                new ResourceNotFoundException("User not exist with login: " + auth.getName()));
+        return new ResponseEntity<>(urlService.findAllStatisticBySiteId(site.getId()), HttpStatus.OK);
     }
 }
