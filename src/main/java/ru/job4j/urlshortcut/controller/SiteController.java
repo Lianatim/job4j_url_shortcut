@@ -40,7 +40,7 @@ public class SiteController {
     }
 
     @PostMapping("/reg")
-    public ResponseEntity<SiteDto> regSave(@Valid @RequestBody Site site) {
+    public ResponseEntity<SiteDto> regSave(@RequestBody Site site) {
         site.setEnabled(true);
         site.setAuthority(authorityService.findByAuthority("ROLE_USER"));
         String login = generateRandomString();
@@ -53,12 +53,6 @@ public class SiteController {
             throw new UserAlreadyExistsException("Person with this id already exists");
         }
         return new ResponseEntity<>(new SiteDto(true, site.getLogin(), password), HttpStatus.CREATED);
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<Site>> findAll() {
-        List<Site> sites = siteService.findAll();
-        return sites.isEmpty() ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(sites, HttpStatus.OK);
     }
 
     private String generateRandomString() {
@@ -78,6 +72,7 @@ public class SiteController {
         Site site = siteService.findByLogin(auth.getName()).orElseThrow(() ->
                 new ResourceNotFoundException("User not exist with login: " + auth.getName()));
         site.addUrlList(url);
+        urlService.save(url);
         String json = "{"
                 + "\"code\" : \"" + code + "\""
                 + "}";
@@ -91,7 +86,7 @@ public class SiteController {
     }
 
     @GetMapping ("/statistic")
-    public ResponseEntity<List<StatisticDTO>> statistic(@PathVariable String code) {
+    public ResponseEntity<List<StatisticDTO>> statistic() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Site site = siteService.findByLogin(auth.getName()).orElseThrow(() ->
                 new ResourceNotFoundException("User not exist with login: " + auth.getName()));

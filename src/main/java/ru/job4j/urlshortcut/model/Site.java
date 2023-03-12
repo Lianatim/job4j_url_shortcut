@@ -6,7 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -20,12 +21,18 @@ public class Site {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private String name;
     private String login;
     private String password;
-    @OneToMany(mappedBy = "site")
-    private List<URL> urlList;
+    private boolean enabled;
     @ManyToOne
     @JoinColumn(name = "authority_id")
     private Authority authority;
-    private boolean enabled;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
+    private Set<URL> urlList = new HashSet<>();
+
+    public void addUrlList(URL url) {
+        this.urlList.add(url);
+        url.setSite(this);
+    }
 }
