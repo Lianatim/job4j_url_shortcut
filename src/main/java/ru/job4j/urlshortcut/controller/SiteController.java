@@ -40,7 +40,7 @@ public class SiteController {
     }
 
     @PostMapping("/reg")
-    public ResponseEntity<SiteDto> regSave(@RequestBody Site site) {
+    public ResponseEntity<SiteDto> regSave(@Valid @RequestBody Site site) {
         site.setEnabled(true);
         site.setAuthority(authorityService.findByAuthority("ROLE_USER"));
         String login = generateRandomString();

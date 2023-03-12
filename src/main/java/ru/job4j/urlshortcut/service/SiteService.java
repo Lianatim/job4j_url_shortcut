@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import ru.job4j.urlshortcut.model.Site;
 import ru.job4j.urlshortcut.repository.SiteRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,10 +15,6 @@ public class SiteService {
     public SiteService(SiteRepository siteRepository, PasswordEncoder encoder) {
         this.siteRepository = siteRepository;
         this.encoder = encoder;
-    }
-
-    public List<Site> findAll() {
-        return siteRepository.findAll();
     }
 
     public void save(Site site) {
