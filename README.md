@@ -8,11 +8,11 @@
 
 - **Сборка приложения в Maven 3.8**
 - **Java 17**
-- **Spring Boot 2.7.3**
-- **Spring Data JPA 2.7.3**
-- **Spring Security 2.7.3**
+- **Spring Boot 2.7.9**
+- **Spring Data JPA 2.7.9**
+- **Spring Security 2.7.9**
 - **Lombok 1.18.22**
-- **JSON Web Token**
+- **JSON Web Token3.4.0**
 
 ## Требования к окружению
 
